@@ -228,4 +228,32 @@ You can find us at
 </p>
 
 
+构建方法
+# 1. 确保 ROS2 已 source
+source /opt/ros/humble/setup.bash
+# 2. (可选) 下载 YOLOv8 ONNX 模型
+# 例如: yolov8n.onnx, yolov8n-seg.onnx, yolov8n-pose.onnx
+# 3. 构建
+mkdir build && cd build
+rm -rf CMakeCache.txt CMakeFiles/
+cmake .. -DBUILD_GRAPHICAL_EXAMPLES=ON \
+         -DONNXRUNTIME_ROOT=/path/to/onnxruntime  # 可选
+cmake --build . -- -j$(nproc)
+运行
+# 基础运行（无 AI）
+./tools/ros2-ai-viewer/ros2-ai-viewer \
+    --rgb-topic /camera/color/image_raw \
+    --pc-topic /camera/depth/color/points
+# 带 AI 模型
+./tools/ros2-ai-viewer/ros2-ai-viewer \
+    --rgb-topic /camera/color/image_raw \
+    --pc-topic /camera/depth/color/points \
+    --model /path/to/yolov8n-seg.onnx \
+    --conf 0.5
 
+下一步
+1. 安装 ONNX Runtime（如需 AI 推理）: sudo apt install libonnxruntime-dev 或从源码编译
+2. 导出 YOLOv8 模型: yolo export model=yolov8n-seg.pt format=onnx
+3. 完善点云 3D 位姿渲染 - 当前 ros2-bridge.cpp 中的点云转换是简化版，需要根据你的点云消息格式调整
+4. 测试运行 - 确认 ROS2 topic 数据能正常接收和显示
+需要我帮你继续完善哪个部分？
