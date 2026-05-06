@@ -27,10 +27,18 @@
 
 namespace rs2
 {
+    struct point_cloud_data
+    {
+        std::vector<float> vertices; // x, y, z
+        std::vector<float> colors;   // r, g, b (0.0-1.0)
+        size_t count = 0;
+    };
+
     struct synced_frame_data
     {
         cv::Mat rgb_image;
         rs2::points pointcloud;
+        point_cloud_data pc_data;
         double timestamp = 0.0;
         bool has_rgb = false;
         bool has_pointcloud = false;
@@ -61,6 +69,7 @@ namespace rs2
         std::shared_ptr<rclcpp::Node> _node;
         std::shared_ptr<message_filters::Subscriber<sensor_msgs::msg::Image>> _rgb_sub;
         std::shared_ptr<message_filters::Subscriber<sensor_msgs::msg::PointCloud2>> _pc_sub;
+        rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr _rgb_sub_single;
 
         using SyncPolicy = message_filters::sync_policies::ApproximateTime<
             sensor_msgs::msg::Image, sensor_msgs::msg::PointCloud2>;
@@ -83,6 +92,8 @@ namespace rs2
 
 #ifdef HAS_ROS2
         rs2::points convert_pc2_to_rs2_points(const sensor_msgs::msg::PointCloud2::ConstSharedPtr& pc_msg);
+        void parse_pc2_to_data(const sensor_msgs::msg::PointCloud2::ConstSharedPtr& pc_msg, point_cloud_data& out_data);
+        void rgb_callback(const sensor_msgs::msg::Image::SharedPtr msg);
 #endif
     };
 }

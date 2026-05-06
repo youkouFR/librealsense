@@ -257,3 +257,25 @@ cmake --build . -- -j$(nproc)
 3. 完善点云 3D 位姿渲染 - 当前 ros2-bridge.cpp 中的点云转换是简化版，需要根据你的点云消息格式调整
 4. 测试运行 - 确认 ROS2 topic 数据能正常接收和显示
 需要我帮你继续完善哪个部分？
+
+# 1. 先 source ROS2 环境
+pip3 install pyrealsense2 2>&1 | tail -5
+source /opt/ros/humble/setup.bash
+# 2. 运行脚本（连接 RealSense 相机并发布 topic）
+python3 tools/ros2-ai-viewer/realsense_ros2_bridge.py
+# 3. 在另一个终端启动 ros2-ai-viewer
+./build/Release/ros2-ai-viewer
+可选参数：
+python3 realsense_ros2_bridge.py \
+  --ros-args \
+  -p rgb_topic:=/camera/color/image_raw \
+  -p pc_topic:=/camera/depth/color/points \
+  -p width:=640 \
+  -p height:=480 \
+  -p fps:=30
+发布的话题：
+Topic	类型	说明
+/camera/color/image_raw	sensor_msgs/msg/Image	RGB 图像 (rgb8)
+/camera/depth/color/points	sensor_msgs/msg/PointCloud2	彩色点云 (x,y,z,rgb)
+
+
